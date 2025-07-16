@@ -1,429 +1,890 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Tarifas de Transporte Chile 2025</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    </style>
-</head>
-<body>
-    <div id="root"></div>
+import React, { useState } from 'react';
+import { Calculator, Car, Users, MapPin, DollarSign, Settings, TrendingUp, Download, FileText, BarChart3, Moon, Sun } from 'lucide-react';
 
-    <script type="text/babel">
-        const { useState } = React;
-
-        const TransportCalculator = () => {
-            const [distanceKm, setDistanceKm] = useState(100);
-            const [passengers, setPassengers] = useState(5);
-            const [includeReturn, setIncludeReturn] = useState(false);
-            const [selectedMargin, setSelectedMargin] = useState(25);
-            const [driverOption, setDriverOption] = useState('employed');
-            const [selectedVehicle, setSelectedVehicle] = useState('h1');
-            const [dieselPrice, setDieselPrice] = useState(995);
-            const [gasolinePrice, setGasolinePrice] = useState(1300);
-
-            // Configuración de vehículos
-            const vehicles = {
-                h1: {
-                    name: "Hyundai H1 2021",
-                    fuelType: "Diesel",
-                    fuelPrice: dieselPrice,
-                    fuelConsumption: 10.5,
-                    maintenance: 85,
-                    insurance: 15,
-                    depreciation: 45,
-                    overhead: 20,
-                    maxPassengers: 10,
-                    icon: "🚐"
-                },
-                explorer: {
-                    name: "Ford Explorer 2025",
-                    fuelType: "Bencina 93",
-                    fuelPrice: gasolinePrice,
-                    fuelConsumption: 11.5,
-                    maintenance: 95,
-                    insurance: 25,
-                    depreciation: 85,
-                    overhead: 25,
-                    maxPassengers: 7,
-                    icon: "🚗"
-                }
-            };
-
-            const currentVehicle = vehicles[selectedVehicle];
-
-            // Opciones de conductor
-            const driverOptions = {
-                basic: { cost: 25, label: "Básico", description: "Cálculo original" },
-                employed: { cost: 175, label: "Empleado", description: "Sueldo + beneficios" },
-                commission: { cost: 85, label: "Comisión", description: "20% del viaje" },
-                owner: { cost: 350, label: "Propietario", description: "Tu tiempo valorizado" }
-            };
-
-            const selectedDriverCost = driverOptions[driverOption]?.cost || 175;
-
-            // Cálculo del costo por kilómetro
-            const fuelCostPerKm = (currentVehicle.fuelPrice * currentVehicle.fuelConsumption) / 100;
-            const totalCostPerKm = fuelCostPerKm + currentVehicle.maintenance + currentVehicle.insurance + 
-                                  currentVehicle.depreciation + selectedDriverCost + currentVehicle.overhead;
-
-            // Margen de ganancia seleccionado
-            const profitMargin = selectedMargin / 100;
-            const finalCostPerKm = totalCostPerKm * (1 + profitMargin);
-
-            // Modelos de ganancia predefinidos
-            const marginModels = [
-                { value: 25, label: "Básico", description: "Competitivo para viajes regulares", color: "bg-blue-500" },
-                { value: 35, label: "Estándar", description: "Equilibrio ganancia-competitividad", color: "bg-green-500" },
-                { value: 45, label: "Premium", description: "Servicio de alta calidad", color: "bg-orange-500" },
-                { value: 50, label: "Ejecutivo", description: "Máxima ganancia para servicios exclusivos", color: "bg-purple-500" }
-            ];
-
-            // Cálculo de tarifas
-            const totalDistance = includeReturn ? distanceKm * 2 : distanceKm;
-            const totalCost = finalCostPerKm * totalDistance;
-            const costPerPerson = passengers > 0 ? totalCost / passengers : totalCost;
-
-            return (
-                <div className="max-w-7xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-                    <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
-                        {/* Header */}
-                        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
-                            <div className="flex items-center space-x-3">
-                                <span className="text-3xl">🚗</span>
-                                <h1 className="text-3xl font-bold">Calculadora de Tarifas de Transporte 2025</h1>
-                            </div>
-                            <p className="mt-2 text-blue-100">Compara costos entre Hyundai H1 y Ford Explorer - Chile</p>
-                        </div>
-
-                        <div className="grid lg:grid-cols-2 gap-8 p-6">
-                            {/* Panel de Configuración */}
-                            <div className="space-y-6">
-                                <div className="bg-gray-50 p-6 rounded-lg">
-                                    <h2 className="text-xl font-semibold mb-4 flex items-center">
-                                        <span className="mr-2">⚙️</span>
-                                        Configuración del Viaje
-                                    </h2>
-
-                                    <div className="space-y-4">
-                                        {/* Configuración de Precios de Combustible */}
-                                        <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                                            <h4 className="font-semibold text-yellow-800 mb-3 flex items-center">
-                                                ⛽ Precios de Combustible Personalizados
-                                            </h4>
-                                            <div className="grid grid-cols-1 gap-3">
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                        🚐 Precio Diesel (pesos/litro)
-                                                    </label>
-                                                    <div className="flex items-center space-x-2">
-                                                        <span className="text-sm text-gray-500">$</span>
-                                                        <input
-                                                            type="number"
-                                                            value={dieselPrice}
-                                                            onChange={(e) => setDieselPrice(Number(e.target.value))}
-                                                            className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500 text-sm"
-                                                            min="800"
-                                                            max="1500"
-                                                        />
-                                                        <button
-                                                            onClick={() => setDieselPrice(995)}
-                                                            className="px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200"
-                                                        >
-                                                            Reset
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                        🚗 Precio Bencina 93 (pesos/litro)
-                                                    </label>
-                                                    <div className="flex items-center space-x-2">
-                                                        <span className="text-sm text-gray-500">$</span>
-                                                        <input
-                                                            type="number"
-                                                            value={gasolinePrice}
-                                                            onChange={(e) => setGasolinePrice(Number(e.target.value))}
-                                                            className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500 text-sm"
-                                                            min="1000"
-                                                            max="1800"
-                                                        />
-                                                        <button
-                                                            onClick={() => setGasolinePrice(1300)}
-                                                            className="px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200"
-                                                        >
-                                                            Reset
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div className="text-xs text-yellow-700 bg-yellow-100 p-2 rounded">
-                                                    💡 <strong>Tip:</strong> Actualiza estos precios según las estaciones de servicio de tu zona.
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Selector de Vehículo */}
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-3">
-                                                Selecciona el Vehículo
-                                            </label>
-                                            <div className="grid grid-cols-1 gap-3">
-                                                {Object.entries(vehicles).map(([key, vehicle]) => (
-                                                    <button
-                                                        key={key}
-                                                        onClick={() => setSelectedVehicle(key)}
-                                                        className={`p-4 rounded-lg border-2 text-left transition-all ${
-                                                            selectedVehicle === key
-                                                                ? 'bg-blue-500 text-white border-transparent shadow-lg'
-                                                                : 'bg-white border-gray-200 hover:border-gray-300'
-                                                        }`}
-                                                    >
-                                                        <div className="flex items-center space-x-3">
-                                                            <span className="text-2xl">{vehicle.icon}</span>
-                                                            <div>
-                                                                <div className="font-semibold">{vehicle.name}</div>
-                                                                <div className={`text-sm ${selectedVehicle === key ? 'text-blue-100' : 'text-gray-600'}`}>
-                                                                    {vehicle.fuelType} ${vehicle.fuelPrice}/L | {vehicle.fuelConsumption}L/100km | Max: {vehicle.maxPassengers} pax
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Distancia del viaje (km)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={distanceKm}
-                                                onChange={(e) => setDistanceKm(Number(e.target.value))}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                                                min="1"
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Número de pasajeros (máx: {currentVehicle.maxPassengers})
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={passengers}
-                                                onChange={(e) => setPassengers(Math.min(Number(e.target.value), currentVehicle.maxPassengers))}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                                                min="1"
-                                                max={currentVehicle.maxPassengers}
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-3">
-                                                Tipo de Conductor
-                                            </label>
-                                            <div className="grid grid-cols-2 gap-2">
-                                                {Object.entries(driverOptions).map(([key, option]) => (
-                                                    <button
-                                                        key={key}
-                                                        onClick={() => setDriverOption(key)}
-                                                        className={`p-3 rounded-lg border-2 text-left transition-all ${
-                                                            driverOption === key
-                                                                ? 'bg-indigo-500 text-white border-transparent shadow-lg'
-                                                                : 'bg-white border-gray-200 hover:border-gray-300'
-                                                        }`}
-                                                    >
-                                                        <div className="font-semibold text-sm">{option.label}</div>
-                                                        <div className={`text-xs mt-1 ${
-                                                            driverOption === key ? 'text-indigo-100' : 'text-gray-600'
-                                                        }`}>
-                                                            ${option.cost}/km
-                                                        </div>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-3">
-                                                Modelo de Ganancia
-                                            </label>
-                                            <div className="grid grid-cols-2 gap-2">
-                                                {marginModels.map((model) => (
-                                                    <button
-                                                        key={model.value}
-                                                        onClick={() => setSelectedMargin(model.value)}
-                                                        className={`p-3 rounded-lg border-2 text-left transition-all ${
-                                                            selectedMargin === model.value
-                                                                ? `${model.color} text-white border-transparent shadow-lg`
-                                                                : 'bg-white border-gray-200 hover:border-gray-300'
-                                                        }`}
-                                                    >
-                                                        <div className="font-semibold text-sm">{model.label} ({model.value}%)</div>
-                                                        <div className={`text-xs mt-1 ${
-                                                            selectedMargin === model.value ? 'text-white' : 'text-gray-600'
-                                                        }`}>
-                                                            {model.description}
-                                                        </div>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                id="return"
-                                                checked={includeReturn}
-                                                onChange={(e) => setIncludeReturn(e.target.checked)}
-                                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                                            />
-                                            <label htmlFor="return" className="ml-2 text-sm font-medium text-gray-700">
-                                                Incluir viaje de regreso
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Panel de Resultados */}
-                            <div className="space-y-6">
-                                {/* Valor por Kilómetro */}
-                                <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 rounded-lg text-white">
-                                    <h3 className="text-lg font-semibold mb-2 flex items-center">
-                                        <span className="mr-2">📈</span>
-                                        Valor Ideal por Kilómetro
-                                    </h3>
-                                    <div className="text-3xl font-bold">${Math.round(finalCostPerKm)}</div>
-                                    <p className="text-green-100 text-sm mt-1">
-                                        {currentVehicle.name} + ganancia del {selectedMargin}%
-                                    </p>
-                                </div>
-
-                                {/* Cálculo del Viaje */}
-                                <div className="bg-white border-2 border-blue-200 p-6 rounded-lg">
-                                    <h3 className="text-lg font-semibold mb-4 flex items-center">
-                                        <span className="mr-2">📍</span>
-                                        Cálculo del Viaje
-                                    </h3>
-
-                                    <div className="space-y-3">
-                                        <div className="flex justify-between">
-                                            <span>Vehículo:</span>
-                                            <span className="font-medium">{currentVehicle.icon} {currentVehicle.name}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Distancia total:</span>
-                                            <span className="font-medium">{totalDistance} km</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Pasajeros:</span>
-                                            <span className="font-medium">{passengers} de {currentVehicle.maxPassengers}</span>
-                                        </div>
-                                        <hr className="my-3" />
-                                        <div className="flex justify-between text-lg">
-                                            <span className="font-semibold">Costo total del viaje:</span>
-                                            <span className="font-bold text-blue-600">${Math.round(totalCost).toLocaleString()}</span>
-                                        </div>
-                                        <div className="flex justify-between text-lg">
-                                            <span className="font-semibold">Costo por persona:</span>
-                                            <span className="font-bold text-green-600">${Math.round(costPerPerson).toLocaleString()}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Desglose de Costos */}
-                                <div className="bg-gray-50 p-6 rounded-lg">
-                                    <h3 className="text-lg font-semibold mb-4 flex items-center">
-                                        <span className="mr-2">🧮</span>
-                                        Desglose de Costos por Km
-                                    </h3>
-
-                                    <div className="space-y-3 text-sm">
-                                        <div className="flex justify-between">
-                                            <span>Combustible ({currentVehicle.fuelType} ${currentVehicle.fuelPrice}/L):</span>
-                                            <span className="font-medium">${Math.round(fuelCostPerKm)}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Mantenimiento:</span>
-                                            <span className="font-medium">${currentVehicle.maintenance}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Seguros:</span>
-                                            <span className="font-medium">${currentVehicle.insurance}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Depreciación:</span>
-                                            <span className="font-medium">${currentVehicle.depreciation}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Conductor ({driverOptions[driverOption].label}):</span>
-                                            <span className="font-medium">${selectedDriverCost}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Gastos admin:</span>
-                                            <span className="font-medium">${currentVehicle.overhead}</span>
-                                        </div>
-                                        <hr className="my-2" />
-                                        <div className="flex justify-between font-semibold">
-                                            <span>Costo base:</span>
-                                            <span>${Math.round(totalCostPerKm)}</span>
-                                        </div>
-                                        <div className="flex justify-between text-green-600 font-semibold">
-                                            <span>Ganancia ({selectedMargin}%):</span>
-                                            <span>+${Math.round(totalCostPerKm * profitMargin)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Comparativa */}
-                                <div className="bg-purple-50 border-2 border-purple-200 p-6 rounded-lg">
-                                    <h3 className="text-lg font-semibold mb-4 text-purple-800">
-                                        🚗 vs 🚐 Comparativa Rápida
-                                    </h3>
-
-                                    <div className="space-y-3 text-sm">
-                                        {Object.entries(vehicles).map(([key, vehicle]) => {
-                                            const vehicleFuelCost = (vehicle.fuelPrice * vehicle.fuelConsumption) / 100;
-                                            const vehicleTotalCost = vehicleFuelCost + vehicle.maintenance + vehicle.insurance + 
-                                                                   vehicle.depreciation + selectedDriverCost + vehicle.overhead;
-                                            const vehicleFinalCost = vehicleTotalCost * (1 + profitMargin);
-
-                                            return (
-                                                <div key={key} className={`p-3 rounded border ${selectedVehicle === key ? 'bg-purple-100 border-purple-300' : 'bg-white'}`}>
-                                                    <div className="flex justify-between items-center">
-                                                        <span className="font-medium">{vehicle.icon} {vehicle.name}</span>
-                                                        <span className="font-bold">${Math.round(vehicleFinalCost)}/km</span>
-                                                    </div>
-                                                    <div className="text-xs text-gray-600 mt-1">
-                                                        {vehicle.fuelType} ${vehicle.fuelPrice}/L • Max {vehicle.maxPassengers} pax
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Footer */}
-                        <div className="bg-gray-100 p-4 text-center text-sm text-gray-600">
-                            <p><strong>Calculadora de Tarifas Chile 2025</strong> | Diesel ${dieselPrice}/L | Bencina 93 ${gasolinePrice}/L</p>
-                            <p className="mt-1">💡 Herramienta para optimizar precios de servicios de transporte</p>
-                        </div>
-                    </div>
+const TransportCalculator = () => {
+  const [distanceKm, setDistanceKm] = useState(100);
+  const [passengers, setPassengers] = useState(5);
+  const [includeReturn, setIncludeReturn] = useState(false);
+  const [selectedMargin, setSelectedMargin] = useState(25);
+  const [driverOption, setDriverOption] = useState('employed');
+  const [selectedVehicle, setSelectedVehicle] = useState('h1');
+  const [dieselPrice, setDieselPrice] = useState(995);
+  const [gasolinePrice, setGasolinePrice] = useState(1300);
+  const [darkMode, setDarkMode] = useState(true);
+  const [activeTab, setActiveTab] = useState('calculator');
+  
+  // ROI Calculator states
+  const [vehiclePrice, setVehiclePrice] = useState(25000000);
+  const [monthlyKm, setMonthlyKm] = useState(3000);
+  const [operatingMonths, setOperatingMonths] = useState(12);
+  
+  // Configuración de vehículos (ahora con más opciones)
+  const vehicles = {
+    h1: {
+      name: "Hyundai H1 2021",
+      fuelType: "Diesel",
+      fuelPrice: dieselPrice,
+      fuelConsumption: 10.5,
+      maintenance: 85,
+      insurance: 15,
+      depreciation: 45,
+      overhead: 20,
+      maxPassengers: 10,
+      icon: "🚐",
+      purchasePrice: 28000000
+    },
+    explorer: {
+      name: "Ford Explorer 2025",
+      fuelType: "Bencina 93",
+      fuelPrice: gasolinePrice,
+      fuelConsumption: 11.5,
+      maintenance: 95,
+      insurance: 25,
+      depreciation: 85,
+      overhead: 25,
+      maxPassengers: 7,
+      icon: "🚗",
+      purchasePrice: 45000000
+    },
+    citroen: {
+      name: "Citroën C5 Aircross 2020",
+      fuelType: "Diesel",
+      fuelPrice: dieselPrice,
+      fuelConsumption: 9.8,
+      maintenance: 90,
+      insurance: 20,
+      depreciation: 55,
+      overhead: 22,
+      maxPassengers: 5,
+      icon: "🚙",
+      purchasePrice: 22000000
+    }
+  };
+  
+  const currentVehicle = vehicles[selectedVehicle];
+  
+  // Opciones de conductor
+  const driverOptions = {
+    basic: { cost: 25, label: "Básico", description: "Cálculo original" },
+    employed: { cost: 175, label: "Empleado", description: "Sueldo + beneficios" },
+    commission: { cost: 85, label: "Comisión", description: "20% del viaje" },
+    owner: { cost: 350, label: "Propietario", description: "Tu tiempo valorizado" }
+  };
+  
+  const selectedDriverCost = driverOptions[driverOption]?.cost || 175;
+  
+  // Cálculo del costo por kilómetro
+  const fuelCostPerKm = (currentVehicle.fuelPrice * currentVehicle.fuelConsumption) / 100;
+  const totalCostPerKm = fuelCostPerKm + currentVehicle.maintenance + currentVehicle.insurance + 
+                        currentVehicle.depreciation + selectedDriverCost + currentVehicle.overhead;
+  
+  const profitMargin = selectedMargin / 100;
+  const finalCostPerKm = totalCostPerKm * (1 + profitMargin);
+  
+  // Modelos de ganancia
+  const marginModels = [
+    { value: 25, label: "Básico", description: "Competitivo para viajes regulares", color: "bg-blue-500" },
+    { value: 35, label: "Estándar", description: "Equilibrio ganancia-competitividad", color: "bg-green-500" },
+    { value: 45, label: "Premium", description: "Servicio de alta calidad", color: "bg-orange-500" },
+    { value: 50, label: "Ejecutivo", description: "Máxima ganancia para servicios exclusivos", color: "bg-purple-500" }
+  ];
+  
+  // Cálculos principales
+  const totalDistance = includeReturn ? distanceKm * 2 : distanceKm;
+  const totalCost = finalCostPerKm * totalDistance;
+  const costPerPerson = passengers > 0 ? totalCost / passengers : totalCost;
+  
+  // ROI Calculations
+  const monthlyRevenue = monthlyKm * finalCostPerKm;
+  const monthlyCosts = monthlyKm * totalCostPerKm;
+  const monthlyProfit = monthlyRevenue - monthlyCosts;
+  const annualProfit = monthlyProfit * operatingMonths;
+  const roiPeriod = vehiclePrice / monthlyProfit;
+  const roiPercentage = (annualProfit / vehiclePrice) * 100;
+  
+  // Tema oscuro/claro
+  const theme = darkMode ? 'dark' : 'light';
+  const bgClass = darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-indigo-100';
+  const cardClass = darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900';
+  const inputClass = darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900';
+  
+  // Función para generar PDF (simulada)
+  const generatePDF = () => {
+    const cotizacion = `
+    COTIZACIÓN DE SERVICIO DE TRANSPORTE
+    =====================================
+    
+    Vehículo: ${currentVehicle.name}
+    Distancia: ${totalDistance} km
+    Pasajeros: ${passengers}
+    Tipo conductor: ${driverOptions[driverOption].label}
+    Margen: ${selectedMargin}%
+    
+    DESGLOSE DE COSTOS:
+    - Combustible: $${Math.round(fuelCostPerKm)}/km
+    - Mantenimiento: $${currentVehicle.maintenance}/km
+    - Seguros: $${currentVehicle.insurance}/km
+    - Depreciación: $${currentVehicle.depreciation}/km
+    - Conductor: $${selectedDriverCost}/km
+    - Administrativos: $${currentVehicle.overhead}/km
+    
+    TOTAL POR KM: $${Math.round(finalCostPerKm)}
+    COSTO TOTAL VIAJE: $${Math.round(totalCost).toLocaleString()}
+    COSTO POR PERSONA: $${Math.round(costPerPerson).toLocaleString()}
+    
+    Cotización válida por 7 días.
+    `;
+    
+    const blob = new Blob([cotizacion], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Cotizacion_${currentVehicle.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+  
+  const TabButton = ({ id, label, icon: Icon }) => (
+    <button
+      onClick={() => setActiveTab(id)}
+      className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+        activeTab === id
+          ? darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
+          : darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+      }`}
+    >
+      <Icon className="w-4 h-4" />
+      <span className="text-sm font-medium">{label}</span>
+    </button>
+  );
+  
+  return (
+    <div className={`min-h-screen ${bgClass} ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+      <div className="max-w-7xl mx-auto p-6">
+        <div className={`${cardClass} rounded-xl shadow-2xl overflow-hidden`}>
+          {/* Header */}
+          <div className={`${darkMode ? 'bg-gradient-to-r from-gray-800 to-gray-900' : 'bg-gradient-to-r from-blue-600 to-indigo-700'} p-6 text-white`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Car className="w-8 h-8" />
+                <div>
+                  <h1 className="text-3xl font-bold">Calculadora de Tarifas Pro 2025</h1>
+                  <p className="text-blue-100">Análisis completo de costos y ROI - Chile</p>
                 </div>
-            );
-        };
+              </div>
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={generatePDF}
+                  className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Exportar PDF</span>
+                </button>
+                <button
+                  onClick={() => setDarkMode(!darkMode)}
+                  className={`p-2 rounded-lg transition-colors ${
+                    darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-blue-500 hover:bg-blue-400'
+                  }`}
+                >
+                  {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+            
+            {/* Navigation Tabs */}
+            <div className="flex space-x-2 mt-4">
+              <TabButton id="calculator" label="Calculadora" icon={Calculator} />
+              <TabButton id="roi" label="ROI Analysis" icon={BarChart3} />
+              <TabButton id="compare" label="Comparador" icon={TrendingUp} />
+              <TabButton id="quote" label="Cotización" icon={FileText} />
+            </div>
+          </div>
+          
+          {/* Tab Content */}
+          <div className="p-6">
+            {activeTab === 'calculator' && (
+              <div className="grid lg:grid-cols-2 gap-8">
+                {/* Panel de Configuración */}
+                <div className="space-y-6">
+                  <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-50'} p-6 rounded-lg`}>
+                    <h2 className="text-xl font-semibold mb-4 flex items-center">
+                      <Settings className="w-5 h-5 mr-2" />
+                      Configuración del Viaje
+                    </h2>
+                    
+                    <div className="space-y-4">
+                      {/* Configuración de Precios de Combustible */}
+                      <div className={`${darkMode ? 'bg-yellow-900 border-yellow-700' : 'bg-yellow-50 border-yellow-200'} p-4 rounded-lg border`}>
+                        <h4 className={`font-semibold mb-3 flex items-center ${darkMode ? 'text-yellow-300' : 'text-yellow-800'}`}>
+                          ⛽ Precios de Combustible
+                        </h4>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                              🚐 Diesel ($/L)
+                            </label>
+                            <input
+                              type="number"
+                              value={dieselPrice}
+                              onChange={(e) => setDieselPrice(Number(e.target.value))}
+                              className={`w-full p-2 border rounded-md text-sm ${inputClass}`}
+                              min="800"
+                              max="1500"
+                            />
+                          </div>
+                          <div>
+                            <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                              🚗 Bencina 93 ($/L)
+                            </label>
+                            <input
+                              type="number"
+                              value={gasolinePrice}
+                              onChange={(e) => setGasolinePrice(Number(e.target.value))}
+                              className={`w-full p-2 border rounded-md text-sm ${inputClass}`}
+                              min="1000"
+                              max="1800"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Selector de Vehículo */}
+                      <div>
+                        <label className={`block text-sm font-medium mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Selecciona el Vehículo
+                        </label>
+                        <div className="space-y-2">
+                          {Object.entries(vehicles).map(([key, vehicle]) => (
+                            <button
+                              key={key}
+                              onClick={() => setSelectedVehicle(key)}
+                              className={`w-full p-3 rounded-lg border-2 text-left transition-all ${
+                                selectedVehicle === key
+                                  ? 'bg-blue-500 text-white border-transparent shadow-lg'
+                                  : darkMode 
+                                    ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white'
+                                    : 'bg-white border-gray-200 hover:border-gray-300 text-gray-900'
+                              }`}
+                            >
+                              <div className="flex items-center space-x-3">
+                                <span className="text-2xl">{vehicle.icon}</span>
+                                <div>
+                                  <div className="font-semibold">{vehicle.name}</div>
+                                  <div className={`text-sm ${selectedVehicle === key ? 'text-blue-100' : darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    {vehicle.fuelType} ${vehicle.fuelPrice}/L | {vehicle.fuelConsumption}L/100km | Max: {vehicle.maxPassengers} pax
+                                  </div>
+                                </div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            Distancia (km)
+                          </label>
+                          <input
+                            type="number"
+                            value={distanceKm}
+                            onChange={(e) => setDistanceKm(Number(e.target.value))}
+                            className={`w-full p-3 border rounded-md ${inputClass}`}
+                            min="1"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            Pasajeros (máx: {currentVehicle.maxPassengers})
+                          </label>
+                          <input
+                            type="number"
+                            value={passengers}
+                            onChange={(e) => setPassengers(Math.min(Number(e.target.value), currentVehicle.maxPassengers))}
+                            className={`w-full p-3 border rounded-md ${inputClass}`}
+                            min="1"
+                            max={currentVehicle.maxPassengers}
+                          />
+                        </div>
+                      </div>
+                      
+                      {/* Tipo de Conductor */}
+                      <div>
+                        <label className={`block text-sm font-medium mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Tipo de Conductor
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {Object.entries(driverOptions).map(([key, option]) => (
+                            <button
+                              key={key}
+                              onClick={() => setDriverOption(key)}
+                              className={`p-3 rounded-lg border-2 text-left transition-all ${
+                                driverOption === key
+                                  ? 'bg-indigo-500 text-white border-transparent shadow-lg'
+                                  : darkMode 
+                                    ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white'
+                                    : 'bg-white border-gray-200 hover:border-gray-300 text-gray-900'
+                              }`}
+                            >
+                              <div className="font-semibold text-sm">{option.label}</div>
+                              <div className={`text-xs mt-1 ${
+                                driverOption === key ? 'text-indigo-100' : darkMode ? 'text-gray-400' : 'text-gray-600'
+                              }`}>
+                                ${option.cost}/km
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Modelo de Ganancia */}
+                      <div>
+                        <label className={`block text-sm font-medium mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Modelo de Ganancia
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {marginModels.map((model) => (
+                            <button
+                              key={model.value}
+                              onClick={() => setSelectedMargin(model.value)}
+                              className={`p-3 rounded-lg border-2 text-left transition-all ${
+                                selectedMargin === model.value
+                                  ? `${model.color} text-white border-transparent shadow-lg`
+                                  : darkMode 
+                                    ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white'
+                                    : 'bg-white border-gray-200 hover:border-gray-300 text-gray-900'
+                              }`}
+                            >
+                              <div className="font-semibold text-sm">{model.label} ({model.value}%)</div>
+                              <div className={`text-xs mt-1 ${
+                                selectedMargin === model.value ? 'text-white' : darkMode ? 'text-gray-400' : 'text-gray-600'
+                              }`}>
+                                {model.description}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="return"
+                          checked={includeReturn}
+                          onChange={(e) => setIncludeReturn(e.target.checked)}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <label htmlFor="return" className={`ml-2 text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Incluir viaje de regreso
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Panel de Resultados */}
+                <div className="space-y-6">
+                  {/* Valor por Kilómetro */}
+                  <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 rounded-lg text-white">
+                    <h3 className="text-lg font-semibold mb-2 flex items-center">
+                      <TrendingUp className="w-5 h-5 mr-2" />
+                      Valor Ideal por Kilómetro
+                    </h3>
+                    <div className="text-3xl font-bold">${Math.round(finalCostPerKm)}</div>
+                    <p className="text-green-100 text-sm mt-1">
+                      {currentVehicle.name} + ganancia del {selectedMargin}%
+                    </p>
+                  </div>
+                  
+                  {/* Cálculo del Viaje */}
+                  <div className={`${cardClass} border-2 ${darkMode ? 'border-blue-500' : 'border-blue-200'} p-6 rounded-lg`}>
+                    <h3 className="text-lg font-semibold mb-4 flex items-center">
+                      <MapPin className="w-5 h-5 mr-2" />
+                      Cálculo del Viaje
+                    </h3>
+                    
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span>Vehículo:</span>
+                        <span className="font-medium">{currentVehicle.icon} {currentVehicle.name}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Distancia total:</span>
+                        <span className="font-medium">{totalDistance} km</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Pasajeros:</span>
+                        <span className="font-medium">{passengers} de {currentVehicle.maxPassengers}</span>
+                      </div>
+                      <hr className="my-3" />
+                      <div className="flex justify-between text-lg">
+                        <span className="font-semibold">Costo total del viaje:</span>
+                        <span className="font-bold text-blue-600">${Math.round(totalCost).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-lg">
+                        <span className="font-semibold">Costo por persona:</span>
+                        <span className="font-bold text-green-600">${Math.round(costPerPerson).toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Desglose de Costos */}
+                  <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-50'} p-6 rounded-lg`}>
+                    <h3 className="text-lg font-semibold mb-4 flex items-center">
+                      <Calculator className="w-5 h-5 mr-2" />
+                      Desglose de Costos por Km
+                    </h3>
+                    
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between">
+                        <span>Combustible ({currentVehicle.fuelType}):</span>
+                        <span className="font-medium">${Math.round(fuelCostPerKm)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Mantenimiento:</span>
+                        <span className="font-medium">${currentVehicle.maintenance}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Seguros:</span>
+                        <span className="font-medium">${currentVehicle.insurance}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Depreciación:</span>
+                        <span className="font-medium">${currentVehicle.depreciation}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Conductor ({driverOptions[driverOption].label}):</span>
+                        <span className="font-medium">${selectedDriverCost}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Administrativos:</span>
+                        <span className="font-medium">${currentVehicle.overhead}</span>
+                      </div>
+                      <hr className="my-2" />
+                      <div className="flex justify-between font-semibold">
+                        <span>Costo base:</span>
+                        <span>${Math.round(totalCostPerKm)}</span>
+                      </div>
+                      <div className="flex justify-between text-green-600 font-semibold">
+                        <span>Ganancia ({selectedMargin}%):</span>
+                        <span>+${Math.round(totalCostPerKm * profitMargin)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {activeTab === 'roi' && (
+              <div className="grid lg:grid-cols-2 gap-8">
+                {/* ROI Input Panel */}
+                <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-50'} p-6 rounded-lg`}>
+                  <h2 className="text-xl font-semibold mb-4 flex items-center">
+                    <BarChart3 className="w-5 h-5 mr-2" />
+                    Análisis de ROI
+                  </h2>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Precio de compra del vehículo
+                      </label>
+                      <input
+                        type="number"
+                        value={vehiclePrice}
+                        onChange={(e) => setVehiclePrice(Number(e.target.value))}
+                        className={`w-full p-3 border rounded-md ${inputClass}`}
+                        placeholder="25000000"
+                      />
+                      <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Precio sugerido: ${currentVehicle.purchasePrice.toLocaleString()}
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Kilómetros mensuales estimados
+                      </label>
+                      <input
+                        type="number"
+                        value={monthlyKm}
+                        onChange={(e) => setMonthlyKm(Number(e.target.value))}
+                        className={`w-full p-3 border rounded-md ${inputClass}`}
+                        placeholder="3000"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Meses de operación al año
+                      </label>
+                      <input
+                        type="number"
+                        value={operatingMonths}
+                        onChange={(e) => setOperatingMonths(Number(e.target.value))}
+                        className={`w-full p-3 border rounded-md ${inputClass}`}
+                        min="1"
+                        max="12"
+                        placeholder="12"
+                      />
+                    </div>
+                    
+                    <button
+                      onClick={() => setVehiclePrice(currentVehicle.purchasePrice)}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors"
+                    >
+                      Usar precio sugerido para {currentVehicle.name}
+                    </button>
+                  </div>
+                </div>
+                
+                {/* ROI Results */}
+                <div className="space-y-6">
+                  <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-6 rounded-lg text-white">
+                    <h3 className="text-lg font-semibold mb-2">ROI Anual</h3>
+                    <div className="text-3xl font-bold">{roiPercentage.toFixed(1)}%</div>
+                    <p className="text-purple-100 text-sm mt-1">
+                      Retorno sobre inversión anual
+                    </p>
+                  </div>
+                  
+                  <div className={`${cardClass} p-6 rounded-lg`}>
+                    <h3 className="text-lg font-semibold mb-4">Proyección Financiera</h3>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between">
+                        <span>Ingresos mensuales:</span>
+                        <span className="font-medium text-green-600">${Math.round(monthlyRevenue).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Costos mensuales:</span>
+                        <span className="font-medium text-red-600">${Math.round(monthlyCosts).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Ganancia mensual:</span>
+                        <span className="font-medium text-blue-600">${Math.round(monthlyProfit).toLocaleString()}</span>
+                      </div>
+                      <hr className="my-2" />
+                      <div className="flex justify-between">
+                        <span>Tiempo de recuperación:</span>
+                        <span className="font-medium text-yellow-600">{roiPeriod.toFixed(1)} meses</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className={`${darkMode ? 'bg-gradient-to-r from-gray-700 to-gray-800' : 'bg-gradient-to-r from-blue-50 to-indigo-50'} p-6 rounded-lg`}>
+                    <h3 className="text-lg font-semibold mb-4">Análisis de Viabilidad</h3>
+                    <div className="space-y-2 text-sm">
+                      {roiPercentage > 20 && (
+                        <div className="flex items-center space-x-2 text-green-600">
+                          <span>✅</span>
+                          <span>Excelente rentabilidad (ROI &gt; 20%)</span>
+                        </div>
+                      )}
+                      {roiPercentage >= 15 && roiPercentage <= 20 && (
+                        <div className="flex items-center space-x-2 text-yellow-600">
+                          <span>⚠️</span>
+                          <span>Rentabilidad moderada (ROI 15-20%)</span>
+                        </div>
+                      )}
+                      {roiPercentage < 15 && (
+                        <div className="flex items-center space-x-2 text-red-600">
+                          <span>❌</span>
+                          <span>Rentabilidad baja (ROI &lt; 15%)</span>
+                        </div>
+                      )}
+                      
+                      {roiPeriod <= 24 && (
+                        <div className="flex items-center space-x-2 text-green-600">
+                          <span>✅</span>
+                          <span>Recuperación rápida (&lt; 2 años)</span>
+                        </div>
+                      )}
+                      {roiPeriod > 36 && (
+                        <div className="flex items-center space-x-2 text-red-600">
+                          <span>⚠️</span>
+                          <span>Recuperación lenta (&gt; 3 años)</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {activeTab === 'compare' && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-semibold mb-6">Comparador de Vehículos</h2>
+                
+                {/* Tabla comparativa */}
+                <div className="overflow-x-auto">
+                  <table className={`w-full text-sm ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow`}>
+                    <thead>
+                      <tr className={`${darkMode ? 'bg-gray-700' : 'bg-gray-50'} border-b`}>
+                        <th className="text-left py-4 px-6 font-semibold">Vehículo</th>
+                        <th className="text-center py-4 px-4 font-semibold">Combustible</th>
+                        <th className="text-center py-4 px-4 font-semibold">Consumo</th>
+                        <th className="text-center py-4 px-4 font-semibold">Costo/km</th>
+                        <th className="text-center py-4 px-4 font-semibold">Precio Final/km</th>
+                        <th className="text-center py-4 px-4 font-semibold">Capacidad</th>
+                        <th className="text-center py-4 px-4 font-semibold">ROI Anual</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(vehicles).map(([key, vehicle]) => {
+                        const vehicleFuelCost = (vehicle.fuelPrice * vehicle.fuelConsumption) / 100;
+                        const vehicleTotalCost = vehicleFuelCost + vehicle.maintenance + vehicle.insurance + 
+                                               vehicle.depreciation + selectedDriverCost + vehicle.overhead;
+                        const vehicleFinalCost = vehicleTotalCost * (1 + profitMargin);
+                        const vehicleMonthlyRevenue = monthlyKm * vehicleFinalCost;
+                        const vehicleMonthlyCosts = monthlyKm * vehicleTotalCost;
+                        const vehicleMonthlyProfit = vehicleMonthlyRevenue - vehicleMonthlyCosts;
+                        const vehicleAnnualProfit = vehicleMonthlyProfit * operatingMonths;
+                        const vehicleROI = (vehicleAnnualProfit / vehicle.purchasePrice) * 100;
+                        
+                        return (
+                          <tr key={key} className={`border-b hover:bg-opacity-50 ${
+                            selectedVehicle === key ? 
+                              (darkMode ? 'bg-blue-900' : 'bg-blue-50') : 
+                              (darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50')
+                          }`}>
+                            <td className="py-4 px-6">
+                              <div className="flex items-center space-x-3">
+                                <span className="text-2xl">{vehicle.icon}</span>
+                                <div>
+                                  <div className="font-semibold">{vehicle.name}</div>
+                                  <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    ${vehicle.purchasePrice.toLocaleString()}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="text-center py-4 px-4">
+                              <div className="font-medium">{vehicle.fuelType}</div>
+                              <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                ${vehicle.fuelPrice}/L
+                              </div>
+                            </td>
+                            <td className="text-center py-4 px-4 font-mono">
+                              {vehicle.fuelConsumption}L/100km
+                            </td>
+                            <td className="text-center py-4 px-4 font-mono">
+                              ${Math.round(vehicleTotalCost)}
+                            </td>
+                            <td className="text-center py-4 px-4 font-mono font-bold">
+                              ${Math.round(vehicleFinalCost)}
+                            </td>
+                            <td className="text-center py-4 px-4">
+                              {vehicle.maxPassengers} pax
+                            </td>
+                            <td className="text-center py-4 px-4">
+                              <span className={`font-bold ${
+                                vehicleROI > 20 ? 'text-green-600' :
+                                vehicleROI > 15 ? 'text-yellow-600' : 'text-red-600'
+                              }`}>
+                                {vehicleROI.toFixed(1)}%
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                
+                {/* Análisis comparativo */}
+                <div className="grid md:grid-cols-3 gap-6">
+                  {Object.entries(vehicles).map(([key, vehicle]) => {
+                    const vehicleFuelCost = (vehicle.fuelPrice * vehicle.fuelConsumption) / 100;
+                    const vehicleTotalCost = vehicleFuelCost + vehicle.maintenance + vehicle.insurance + 
+                                           vehicle.depreciation + selectedDriverCost + vehicle.overhead;
+                    const vehicleFinalCost = vehicleTotalCost * (1 + profitMargin);
+                    
+                    return (
+                      <div key={key} className={`${cardClass} p-6 rounded-lg border-2 ${
+                        selectedVehicle === key ? 'border-blue-500' : darkMode ? 'border-gray-600' : 'border-gray-200'
+                      }`}>
+                        <div className="text-center mb-4">
+                          <div className="text-3xl mb-2">{vehicle.icon}</div>
+                          <h3 className="font-semibold">{vehicle.name}</h3>
+                        </div>
+                        
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span>Precio/km:</span>
+                            <span className="font-bold">${Math.round(vehicleFinalCost)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Capacidad:</span>
+                            <span>{vehicle.maxPassengers} pax</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Combustible:</span>
+                            <span>${Math.round(vehicleFuelCost)}/km</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Inversión:</span>
+                            <span>${(vehicle.purchasePrice / 1000000).toFixed(1)}M</span>
+                          </div>
+                        </div>
+                        
+                        <button
+                          onClick={() => setSelectedVehicle(key)}
+                          className={`w-full mt-4 py-2 px-4 rounded-lg transition-colors ${
+                            selectedVehicle === key
+                              ? 'bg-blue-600 text-white'
+                              : darkMode 
+                                ? 'bg-gray-600 hover:bg-gray-500 text-white'
+                                : 'bg-gray-200 hover:bg-gray-300 text-gray-900'
+                          }`}
+                        >
+                          {selectedVehicle === key ? 'Seleccionado' : 'Seleccionar'}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            
+            {activeTab === 'quote' && (
+              <div className="max-w-4xl mx-auto">
+                <div className={`${cardClass} p-8 rounded-lg shadow-lg`}>
+                  <div className="text-center mb-8">
+                    <h2 className="text-3xl font-bold mb-2">COTIZACIÓN DE SERVICIO</h2>
+                    <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Servicio de Transporte Profesional
+                    </p>
+                    <div className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-sm mt-2`}>
+                      Fecha: {new Date().toLocaleDateString('es-CL')} | Válida por 7 días
+                    </div>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 border-b pb-2">Detalles del Servicio</h3>
+                      <div className="space-y-3">
+                        <div className="flex justify-between">
+                          <span>Vehículo:</span>
+                          <span className="font-medium">{currentVehicle.icon} {currentVehicle.name}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Distancia:</span>
+                          <span className="font-medium">{totalDistance} km</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Pasajeros:</span>
+                          <span className="font-medium">{passengers} de {currentVehicle.maxPassengers}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Tipo conductor:</span>
+                          <span className="font-medium">{driverOptions[driverOption].label}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Modalidad:</span>
+                          <span className="font-medium">{marginModels.find(m => m.value === selectedMargin).label}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 border-b pb-2">Desglose de Costos</h3>
+                      <div className="space-y-3 text-sm">
+                        <div className="flex justify-between">
+                          <span>Combustible:</span>
+                          <span>${Math.round(fuelCostPerKm * totalDistance).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Mantenimiento:</span>
+                          <span>${Math.round(currentVehicle.maintenance * totalDistance).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Seguros:</span>
+                          <span>${Math.round(currentVehicle.insurance * totalDistance).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Conductor:</span>
+                          <span>${Math.round(selectedDriverCost * totalDistance).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Administrativos:</span>
+                          <span>${Math.round(currentVehicle.overhead * totalDistance).toLocaleString()}</span>
+                        </div>
+                        <hr className="my-2" />
+                        <div className="flex justify-between">
+                          <span>Subtotal:</span>
+                          <span>${Math.round(totalCostPerKm * totalDistance).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between text-green-600">
+                          <span>Margen ({selectedMargin}%):</span>
+                          <span>${Math.round(totalCostPerKm * profitMargin * totalDistance).toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="border-t pt-6">
+                    <div className="flex justify-between items-center mb-6">
+                      <div>
+                        <div className="text-2xl font-bold text-blue-600">
+                          TOTAL: ${Math.round(totalCost).toLocaleString()}
+                        </div>
+                        <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Costo por persona: ${Math.round(costPerPerson).toLocaleString()}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-semibold">Precio por km:</div>
+                        <div className="text-xl font-bold text-green-600">${Math.round(finalCostPerKm)}</div>
+                      </div>
+                    </div>
+                    
+                    <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-50'} p-4 rounded-lg mb-6`}>
+                      <h4 className="font-semibold mb-2">Incluye:</h4>
+                      <ul className={`text-sm space-y-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <li>✅ Conductor profesional</li>
+                        <li>✅ Combustible para todo el trayecto</li>
+                        <li>✅ Seguro de responsabilidad civil</li>
+                        <li>✅ Mantenimiento del vehículo</li>
+                        <li>✅ Servicio puerta a puerta</li>
+                      </ul>
+                    </div>
+                    
+                    <div className="flex gap-4">
+                      <button
+                        onClick={generatePDF}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2"
+                      >
+                        <Download className="w-5 h-5" />
+                        <span>Descargar Cotización</span>
+                      </button>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(`
+Cotización de Servicio de Transporte
+Vehículo: ${currentVehicle.name}
+Distancia: ${totalDistance} km
+Pasajeros: ${passengers}
+TOTAL: ${Math.round(totalCost).toLocaleString()}
+Precio por persona: ${Math.round(costPerPerson).toLocaleString()}
+                        `)}
+                        className={`px-6 py-3 rounded-lg transition-colors ${
+                          darkMode 
+                            ? 'bg-gray-700 hover:bg-gray-600 text-white' 
+                            : 'bg-gray-200 hover:bg-gray-300 text-gray-900'
+                        }`}
+                      >
+                        Copiar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-        ReactDOM.render(<TransportCalculator />, document.getElementById('root'));
-    </script>
-</body>
-</html>
+export default TransportCalculator;
