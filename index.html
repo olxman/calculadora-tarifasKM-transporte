@@ -85,12 +85,12 @@
             
             const currentVehicle = vehicles[selectedVehicle];
             
-            // Opciones de conductor
+            // Opciones de conductor (VALORES ACTUALIZADOS 2025)
             const driverOptions = {
-                basic: { cost: 25, label: "Básico", description: "Cálculo original" },
-                employed: { cost: 175, label: "Empleado", description: "Sueldo + beneficios" },
-                commission: { cost: 85, label: "Comisión", description: "20% del viaje" },
-                owner: { cost: 350, label: "Propietario", description: "Tu tiempo valorizado" }
+                basic: { cost: 25, label: "Básico", description: "Solo referencia teórica" },
+                employed: { cost: 190, label: "Empleado", description: "Sueldo + cargas sociales reales" },
+                commission: { cost: 100, label: "Comisión", description: "22-25% del viaje (estándar)" },
+                owner: { cost: 550, label: "Propietario", description: "Valor tiempo empresario" }
             };
             
             const selectedDriverCost = driverOptions[driverOption]?.cost || 175;
