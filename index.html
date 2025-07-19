@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import { Calculator, Car, BarChart3, FileText, Settings, Download } from 'lucide-react';
 
@@ -12,61 +14,61 @@ const TransportCalculator = () => {
   const [gasolinePrice, setGasolinePrice] = useState(1300);
   const [commissionPercentage, setCommissionPercentage] = useState(25);
   
-  // Configuración de vehículos (VALORES ACTUALIZADOS 2025 CHILE)
+  // Configuración de vehículos (VALORES AJUSTADOS PARA DIFERENCIACIÓN)
   const vehicles = {
     h1: {
       name: "Hyundai H1 2021",
       fuelType: "Diesel",
-      fuelConsumption: 11.5, // Consumo real más alto (10-14 L/100km según uso)
-      maintenance: 85, // Mantenimiento real más alto
-      insurance: 28, // Seguro comercial ajustado
-      depreciation: 55, // Mayor depreciación real
-      overhead: 25,
+      fuelConsumption: 10.5,
+      maintenance: 65,
+      insurance: 12,
+      depreciation: 35,
+      overhead: 18,
       maxPassengers: 10,
       icon: "🚐",
       purchasePrice: 28000000,
-      basePassengerCost: 12, // Ajustado al mercado
-      efficiencyFactor: 0.85 // Mejor eficiencia con grupos grandes
+      basePassengerCost: 8,
+      efficiencyFactor: 0.9
     },
     explorer: {
       name: "Ford Explorer 2025",
       fuelType: "Bencina 93",
-      fuelConsumption: 11.1, // 9.0 km/L = 11.1 L/100km (oficial)
-      maintenance: 95, // Mantenimiento más realista
-      insurance: 35, // Seguro ajustado
-      depreciation: 75, // Depreciación más realista
-      overhead: 28, // Gastos administrativos
-      maxPassengers: 7, // Explorer 2025 tiene 7 plazas
+      fuelConsumption: 12.8,
+      maintenance: 135,
+      insurance: 45,
+      depreciation: 95,
+      overhead: 35,
+      maxPassengers: 5,
       icon: "🚗",
-      purchasePrice: 47000000, // Precio promedio versiones ($43-56M)
-      basePassengerCost: 15, // Ajustado, sigue siendo premium
-      efficiencyFactor: 1.1 // Menos eficiente por peso y potencia
+      purchasePrice: 45000000,
+      basePassengerCost: 25,
+      efficiencyFactor: 1.2
     },
     citroen: {
       name: "Citroën C5 Aircross 2020",
       fuelType: "Diesel",
       fuelConsumption: 9.8,
-      maintenance: 75, // Mantenimiento medio
-      insurance: 22, // Seguro intermedio
-      depreciation: 48, // Depreciación media
+      maintenance: 75,
+      insurance: 22,
+      depreciation: 48,
       overhead: 20,
-      maxPassengers: 5, // C5 Aircross tiene 5 plazas
+      maxPassengers: 4,
       icon: "🚙",
       purchasePrice: 22000000,
-      basePassengerCost: 14, // Ajustado ligeramente
-      efficiencyFactor: 0.95 // Buena eficiencia diesel
+      basePassengerCost: 18,
+      efficiencyFactor: 1.0
     }
   };
   
-  const currentVehicle = vehicles[selectedVehicle];
+  const currentVehicle = vehicles[selectedVehicle as keyof typeof vehicles];
   const currentFuelPrice = currentVehicle.fuelType === "Diesel" ? dieselPrice : gasolinePrice;
   
   // Opciones de conductor
   const driverOptions = {
-    basic: { cost: 35, label: "Básico" },
-    employed: { cost: 210, label: "Empleado" },
+    basic: { cost: 25, label: "Básico" },
+    employed: { cost: 190, label: "Empleado" },
     commission: { cost: 'variable', label: "Comisión" },
-    owner: { cost: 600, label: "Propietario" }
+    owner: { cost: 550, label: "Propietario" }
   };
   
   // Cálculos con factor de pasajeros MEJORADO
@@ -90,7 +92,7 @@ const TransportCalculator = () => {
     totalCostPerKm = baseCostPerKm + commissionCost;
     finalCostPerKm = totalCostPerKm * (1 + profitMargin);
   } else {
-    const driverCost = driverOptions[driverOption].cost;
+    const driverCost = driverOptions[driverOption as keyof typeof driverOptions].cost as number;
     totalCostPerKm = (fuelCostPerKm + currentVehicle.maintenance + currentVehicle.insurance + 
                     currentVehicle.depreciation + driverCost + currentVehicle.overhead + passengerCostPerKm) * occupancyMultiplier;
     finalCostPerKm = totalCostPerKm * (1 + profitMargin);
@@ -161,7 +163,22 @@ const TransportCalculator = () => {
                             className="w-full p-2 border rounded-md text-sm bg-gray-700 border-gray-600 text-white"
                           />
                         </div>
-                        <div>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Footer */}
+        <div className="bg-gray-800 p-4 text-center text-sm text-gray-400 mt-6 rounded-lg">
+          <p><strong>Calculadora de Tarifas Pro 2025</strong> | Diesel ${dieselPrice}/L | Bencina 93 ${gasolinePrice}/L</p>
+          <p className="mt-1">💡 Herramienta profesional para servicios de transporte en Chile</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default TransportCalculator;          <div>
                           <label className="block text-sm font-medium mb-1 text-gray-300">Bencina 93 ($/L)</label>
                           <input
                             type="number"
@@ -390,9 +407,9 @@ const TransportCalculator = () => {
                       <div className="flex justify-between">
                         <span>Conductor:</span>
                         <span>
-                          {driverOption === 'commission' 
-                            ? `${Math.round(finalCostPerKm * (commissionPercentage / 100))}`
-                            : `${driverOptions[driverOption].cost}`
+                          ${driverOption === 'commission' 
+                            ? Math.round(finalCostPerKm * (commissionPercentage / 100))
+                            : (driverOptions[driverOption as keyof typeof driverOptions].cost as number)
                           }
                         </span>
                       </div>
@@ -409,20 +426,12 @@ const TransportCalculator = () => {
                     <h3 className="text-lg font-semibold mb-4 text-amber-300">📊 Vs Competencia (25km)</h3>
                     <div className="space-y-3 text-sm">
                       <div className="flex justify-between">
-                        <span>Transfer Aeropuerto (Transvip):</span>
-                        <span>$26,400 - $33,400</span>
+                        <span>Transfer Aeropuerto:</span>
+                        <span>$26,000 - $32,000</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Taxi Oficial Aeropuerto:</span>
-                        <span>$20,000 - $30,000</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Uber X (5 pax):</span>
-                        <span>$12,500 - $18,750</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Uber XL (6 pax):</span>
-                        <span>$15,625 - $23,500</span>
+                        <span>Uber XL:</span>
+                        <span>$25,000 - $35,000</span>
                       </div>
                       <div className="flex justify-between font-bold text-green-400">
                         <span>Tu precio ({passengers} pax):</span>
@@ -431,8 +440,8 @@ const TransportCalculator = () => {
                       <div className="flex justify-between text-yellow-400">
                         <span>Categoria:</span>
                         <span>
-                          {selectedVehicle === 'h1' ? 'Van Grupal Premium' : 
-                           selectedVehicle === 'explorer' ? 'SUV Premium 7 pax' : 'SUV Ejecutivo'}
+                          {selectedVehicle === 'h1' ? 'Económico Grupal' : 
+                           selectedVehicle === 'explorer' ? 'Premium' : 'Estándar'}
                         </span>
                       </div>
                     </div>
@@ -447,11 +456,11 @@ const TransportCalculator = () => {
                           • ${Math.round(costPerPerson).toLocaleString()} por persona ({passengers} pax)
                         </div>
                         <div className="text-green-300">
-                          • {selectedVehicle === 'h1' ? 'Ideal grupos/empresas, diesel económico' : 
-                             selectedVehicle === 'explorer' ? '7 plazas, confort premium SUV' : 'Balance precio-calidad, 5 plazas'}
+                          • {selectedVehicle === 'h1' ? 'Ideal para grupos grandes y económico' : 
+                             selectedVehicle === 'explorer' ? 'Lujo y confort premium' : 'Equilibrio precio-calidad'}
                         </div>
                         <div className="text-green-300">
-                          • Precio fijo sin algoritmos dinámicos
+                          • Precio fijo sin tarifas dinámicas
                         </div>
                       </div>
                     </div>
@@ -489,7 +498,7 @@ const TransportCalculator = () => {
                         </div>
                         <div className="flex justify-between">
                           <span>Conductor:</span>
-                          <span className="font-medium">{driverOptions[driverOption].label}</span>
+                          <span className="font-medium">{driverOptions[driverOption as keyof typeof driverOptions].label}</span>
                         </div>
                       </div>
                     </div>
@@ -514,7 +523,7 @@ const TransportCalculator = () => {
                           <span>
                             ${driverOption === 'commission' 
                               ? Math.round(finalCostPerKm * (commissionPercentage / 100) * distanceKm).toLocaleString()
-                              : Math.round(driverOptions[driverOption].cost * distanceKm).toLocaleString()
+                              : Math.round((driverOptions[driverOption as keyof typeof driverOptions].cost as number) * distanceKm).toLocaleString()
                             }
                           </span>
                         </div>
@@ -560,8 +569,8 @@ const TransportCalculator = () => {
 Vehículo: ${currentVehicle.name}
 Distancia: ${distanceKm} km
 Pasajeros: ${passengers}
-TOTAL: ${Math.round(totalCost).toLocaleString()}
-Por persona: ${Math.round(costPerPerson).toLocaleString()}
+TOTAL: $${Math.round(totalCost).toLocaleString()}
+Por persona: $${Math.round(costPerPerson).toLocaleString()}
 Válida por 7 días`;
                         navigator.clipboard.writeText(cotizacion);
                         alert('Cotización copiada al portapapeles');
@@ -573,19 +582,3 @@ Válida por 7 días`;
                     </button>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </div>
-        
-        {/* Footer */}
-        <div className="bg-gray-800 p-4 text-center text-sm text-gray-400 mt-6 rounded-lg">
-          <p><strong>Calculadora de Tarifas Pro 2025</strong> | Diesel ${dieselPrice}/L | Bencina 93 ${gasolinePrice}/L</p>
-          <p className="mt-1">💡 Herramienta profesional para servicios de transporte en Chile</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default TransportCalculator;
